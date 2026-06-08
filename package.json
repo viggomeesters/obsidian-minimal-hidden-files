@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-minimal-hidden-files",
-	"version": "0.1.0",
-	"description": "Minimal Obsidian plugin that reveals safe dotfiles and dotfolders in the native File Explorer.",
+	"version": "0.1.1",
+	"description": "Minimal plugin that reveals safe dotfiles and dotfolders in the native File Explorer.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {

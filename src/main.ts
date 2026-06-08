@@ -1,5 +1,4 @@
-import { App, Notice, Platform, Plugin, PluginSettingTab, Setting } from "obsidian";
-import { stat } from "fs/promises";
+import { App, Notice, Platform, Plugin, PluginSettingTab, Setting, type Stat } from "obsidian";
 
 declare module "obsidian" {
 	interface Vault {
@@ -18,6 +17,7 @@ interface InternalFileSystemAdapter {
 	reconcileDeletion: ReconcileDeletion;
 	reconcileFileInternal?(realPath: string, vaultPath: string): Promise<void>;
 	reconcileFolderCreation(realPath: string, vaultPath: string): Promise<void>;
+	stat(vaultPath: string): Promise<Stat | null>;
 }
 
 interface MinimalHiddenFilesSettings {
@@ -171,10 +171,9 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 	private async revealPath(vaultPath: string): Promise<void> {
 		const adapter = this.adapter();
 		const realPath = adapter.getRealPath(vaultPath);
-		const fullPath = adapter.getFullPath(vaultPath);
-		const fileStat = await stat(fullPath);
+		const pathStat = await adapter.stat(vaultPath);
 
-		if (fileStat.isDirectory()) {
+		if (pathStat?.type === "folder") {
 			await adapter.reconcileFolderCreation(realPath, vaultPath);
 			await adapter.listRecursive(vaultPath);
 			return;

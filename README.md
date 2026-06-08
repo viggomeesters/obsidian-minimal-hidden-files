@@ -30,7 +30,7 @@ It does not add a sidebar, tree browser, preview panel, dashboard, or custom fil
 
 Minimal Hidden Files does not make network requests, does not use telemetry, and does not read or write outside your vault.
 
-The plugin uses Obsidian's desktop file-system adapter and Node's `fs` module to detect whether a hidden vault path is a file or folder. This is why the plugin is desktop-only.
+The plugin uses Obsidian's desktop file-system adapter to detect and register hidden vault paths. This is why the plugin is desktop-only.
 
 Revealed files use Obsidian's normal file behavior. Depending on the file type and installed plugins, a revealed file may be viewable, editable, movable, deleted, or opened by another community plugin. Minimal Hidden Files does not enforce read-only mode.
 
@@ -117,10 +117,10 @@ The current release is ready for review when:
 
 - root `README.md`, `LICENSE`, and `manifest.json` exist
 - `manifest.json.id` is `minimal-hidden-files`
-- `manifest.json.version` is `0.1.0`
-- GitHub release `0.1.0` exists
+- `manifest.json.version` is `0.1.1`
+- GitHub release `0.1.1` exists
 - release assets include `main.js`, `manifest.json`, and `styles.css`
-- `versions.json` maps plugin version `0.1.0` to minimum Obsidian version `1.8.0`
+- `versions.json` maps plugin version `0.1.1` to minimum Obsidian version `1.8.0`
 
 Official references:
 
