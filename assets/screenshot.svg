@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">Minimal Hidden Files screenshot mockup</title>
+  <desc id="desc">Mockup of allowed dotfiles visible in Obsidian's native File Explorer.</desc>
+  <rect width="1280" height="760" fill="#f8fafc"/>
+  <rect x="80" y="70" width="1120" height="620" rx="18" fill="#111827"/>
+  <rect x="80" y="70" width="1120" height="48" rx="18" fill="#0f172a"/>
+  <rect x="80" y="104" width="1120" height="14" fill="#0f172a"/>
+  <circle cx="112" cy="94" r="6" fill="#f87171"/>
+  <circle cx="134" cy="94" r="6" fill="#fbbf24"/>
+  <circle cx="156" cy="94" r="6" fill="#34d399"/>
+  <text x="188" y="100" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700" fill="#e5e7eb">obsidian-test-vault</text>
+
+  <rect x="110" y="145" width="330" height="515" rx="10" fill="#1f2937"/>
+  <rect x="470" y="145" width="700" height="515" rx="10" fill="#f8fafc"/>
+  <text x="138" y="185" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700" fill="#f8fafc">Files</text>
+  <text x="500" y="195" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800" fill="#111827">.mcp.json</text>
+  <text x="500" y="236" font-family="Inter, Arial, sans-serif" font-size="18" fill="#475569">Opened through Obsidian's normal workspace flow.</text>
+
+  <g font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="18">
+    <text x="150" y="232" fill="#d1d5db">Welcome.md</text>
+    <text x="150" y="270" fill="#d1d5db">README.md</text>
+    <text x="150" y="308" fill="#99f6e4">.claude</text>
+    <text x="182" y="346" fill="#99f6e4">commands</text>
+    <text x="214" y="384" fill="#99f6e4">example.md</text>
+    <text x="150" y="422" fill="#99f6e4">.codex</text>
+    <text x="150" y="460" fill="#99f6e4">.env</text>
+    <text x="150" y="498" fill="#99f6e4">.env.example</text>
+    <text x="150" y="536" fill="#99f6e4">.gitignore</text>
+    <text x="150" y="574" fill="#99f6e4">.mcp.json</text>
+  </g>
+
+  <g font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="19">
+    <text x="520" y="300" fill="#0f172a">{</text>
+    <text x="552" y="338" fill="#0f766e">"hiddenFiles"</text>
+    <text x="720" y="338" fill="#0f172a">: true,</text>
+    <text x="552" y="376" fill="#0f766e">"denylist"</text>
+    <text x="692" y="376" fill="#0f172a">: [".obsidian", ".trash", ".git"]</text>
+    <text x="520" y="414" fill="#0f172a">}</text>
+  </g>
+
+  <rect x="500" y="485" width="620" height="86" rx="10" fill="#ecfeff"/>
+  <text x="530" y="520" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800" fill="#134e4a">Minimal surface</text>
+  <text x="530" y="552" font-family="Inter, Arial, sans-serif" font-size="17" fill="#155e75">No custom tree, no file manager, no preview panel.</text>
+</svg>

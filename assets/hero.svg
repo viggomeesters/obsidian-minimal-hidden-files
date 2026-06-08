@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="520" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
+  <title id="title">Minimal Hidden Files</title>
+  <desc id="desc">A repository hero for an Obsidian plugin that reveals safe dotfiles in the native File Explorer.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="0.52" stop-color="#1f2937"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#020617" flood-opacity="0.26"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="520" fill="url(#bg)"/>
+  <path d="M0 420 C180 360 330 455 520 390 C720 320 820 210 1010 260 C1220 315 1360 170 1600 230 L1600 520 L0 520 Z" fill="#14b8a6" opacity="0.22"/>
+  <path d="M0 90 C210 145 320 52 510 96 C730 148 860 244 1060 184 C1270 120 1380 165 1600 112 L1600 0 L0 0 Z" fill="#60a5fa" opacity="0.16"/>
+
+  <g filter="url(#shadow)">
+    <rect x="920" y="78" width="480" height="364" rx="20" fill="url(#panel)"/>
+    <rect x="920" y="78" width="480" height="50" rx="20" fill="#111827"/>
+    <rect x="920" y="112" width="480" height="16" fill="#111827"/>
+    <circle cx="950" cy="103" r="7" fill="#f87171"/>
+    <circle cx="974" cy="103" r="7" fill="#fbbf24"/>
+    <circle cx="998" cy="103" r="7" fill="#34d399"/>
+    <text x="1040" y="108" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="#f8fafc">Native File Explorer</text>
+
+    <g font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22" fill="#111827">
+      <text x="968" y="177">.claude</text>
+      <text x="1004" y="219">commands</text>
+      <text x="1040" y="261">example.md</text>
+      <text x="968" y="303">.codex</text>
+      <text x="968" y="345">.env</text>
+      <text x="968" y="387">.mcp.json</text>
+    </g>
+    <g stroke="#0f766e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M944 168 h10 l8 8 h18"/>
+      <path d="M980 210 h10 l8 8 h18"/>
+      <path d="M944 294 h10 l8 8 h18"/>
+    </g>
+    <g fill="#ef4444" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="18">
+      <text x="1190" y="177">hidden</text>
+      <text x="1190" y="303">hidden</text>
+      <text x="1190" y="345">visible</text>
+      <text x="1190" y="387">visible</text>
+    </g>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif" fill="#f8fafc">
+    <text x="160" y="176" font-size="82" font-weight="800">Minimal</text>
+    <text x="160" y="266" font-size="82" font-weight="800">Hidden Files</text>
+    <text x="164" y="326" font-size="30" fill="#d1fae5">Reveal safe dotfiles in Obsidian's native File Explorer.</text>
+    <text x="164" y="376" font-size="22" fill="#bfdbfe">No sidebar. No custom viewer. Clear denylist.</text>
+  </g>
+
+  <g transform="translate(164 414)">
+    <rect width="132" height="38" rx="19" fill="#f8fafc" opacity="0.95"/>
+    <text x="66" y="26" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">desktop only</text>
+    <rect x="148" width="148" height="38" rx="19" fill="#d1fae5" opacity="0.96"/>
+    <text x="222" y="26" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#065f46">native explorer</text>
+    <rect x="312" width="128" height="38" rx="19" fill="#dbeafe" opacity="0.96"/>
+    <text x="376" y="26" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#1e3a8a">MIT license</text>
+  </g>
+</svg>

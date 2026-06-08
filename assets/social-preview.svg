@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Minimal Hidden Files social preview</title>
+  <desc id="desc">Social preview image for Minimal Hidden Files.</desc>
+  <rect width="1280" height="640" fill="#0f172a"/>
+  <path d="M0 500 C170 420 290 540 470 455 C650 370 760 250 930 310 C1100 370 1140 220 1280 260 L1280 640 L0 640 Z" fill="#14b8a6" opacity="0.32"/>
+  <rect x="735" y="110" width="370" height="420" rx="22" fill="#f8fafc"/>
+  <rect x="735" y="110" width="370" height="54" rx="22" fill="#111827"/>
+  <rect x="735" y="146" width="370" height="18" fill="#111827"/>
+  <text x="775" y="218" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="27" fill="#0f766e">.claude</text>
+  <text x="775" y="270" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="27" fill="#0f766e">.codex</text>
+  <text x="775" y="322" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="27" fill="#0f766e">.env</text>
+  <text x="775" y="374" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="27" fill="#0f766e">.mcp.json</text>
+  <text x="775" y="448" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="800" fill="#111827">native File Explorer</text>
+  <text x="100" y="220" font-family="Inter, Arial, sans-serif" font-size="76" font-weight="850" fill="#f8fafc">Minimal</text>
+  <text x="100" y="304" font-family="Inter, Arial, sans-serif" font-size="76" font-weight="850" fill="#f8fafc">Hidden Files</text>
+  <text x="106" y="372" font-family="Inter, Arial, sans-serif" font-size="30" fill="#d1fae5">Safe dotfiles in Obsidian.</text>
+  <text x="106" y="420" font-family="Inter, Arial, sans-serif" font-size="24" fill="#bfdbfe">No sidebar. No custom viewer. Clear denylist.</text>
+</svg>

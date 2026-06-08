@@ -40,13 +40,15 @@ function isDotSegment(segment: string): boolean {
 	return segment.length > 1 && segment.startsWith(".");
 }
 
-function hasDeniedSegment(vaultPath: string): boolean {
-	return pathSegments(vaultPath).some((segment) => DENIED_DOT_SEGMENTS.has(segment));
+function hasDeniedSegment(vaultPath: string, configDir: string): boolean {
+	return pathSegments(vaultPath).some(
+		(segment) => segment === configDir || DENIED_DOT_SEGMENTS.has(segment),
+	);
 }
 
-function isAllowedHiddenPath(vaultPath: string): boolean {
+function isAllowedHiddenPath(vaultPath: string, configDir: string): boolean {
 	const segments = pathSegments(vaultPath);
-	return segments.some(isDotSegment) && !hasDeniedSegment(vaultPath);
+	return segments.some(isDotSegment) && !hasDeniedSegment(vaultPath, configDir);
 }
 
 export default class MinimalHiddenFilesPlugin extends Plugin {
@@ -136,7 +138,10 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 		this.originalReconcileDeletion = originalReconcileDeletion;
 
 		adapter.reconcileDeletion = async (realPath: string, vaultPath: string): Promise<void> => {
-			if (!this.settings.showHiddenFiles || !isAllowedHiddenPath(vaultPath)) {
+			if (
+				!this.settings.showHiddenFiles ||
+				!isAllowedHiddenPath(vaultPath, this.app.vault.configDir)
+			) {
 				await originalReconcileDeletion(realPath, vaultPath);
 				return;
 			}
@@ -237,8 +242,6 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-
-		containerEl.createEl("h2", { text: "Minimal Hidden Files" });
 
 		new Setting(containerEl)
 			.setName("Reveal dotfiles and dotfolders")
