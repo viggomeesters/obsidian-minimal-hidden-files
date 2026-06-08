@@ -1,0 +1,10 @@
+{
+	"id": "minimal-hidden-files",
+	"name": "Minimal Hidden Files",
+	"version": "0.1.0",
+	"minAppVersion": "1.8.0",
+	"description": "Reveal safe dotfiles and dotfolders in Obsidian's native File Explorer.",
+	"author": "Viggo Meesters",
+	"authorUrl": "https://github.com/viggomeesters",
+	"isDesktopOnly": true
+}
