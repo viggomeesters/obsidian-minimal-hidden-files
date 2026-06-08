@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Remove the hardcoded `.obsidian` source-code string; the vault configuration folder is denied through `Vault.configDir`.
+- Remove the optional dotfile-warning i18n patch to avoid unsafe `any` review warnings.
+
 ## 0.1.1
 
 - Remove "Obsidian" from the manifest description for community review compliance.

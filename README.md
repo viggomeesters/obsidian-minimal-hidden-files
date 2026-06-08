@@ -117,10 +117,10 @@ The current release is ready for review when:
 
 - root `README.md`, `LICENSE`, and `manifest.json` exist
 - `manifest.json.id` is `minimal-hidden-files`
-- `manifest.json.version` is `0.1.1`
-- GitHub release `0.1.1` exists
+- `manifest.json.version` is `0.1.2`
+- GitHub release `0.1.2` exists
 - release assets include `main.js`, `manifest.json`, and `styles.css`
-- `versions.json` maps plugin version `0.1.1` to minimum Obsidian version `1.8.0`
+- `versions.json` maps plugin version `0.1.2` to minimum Obsidian version `1.8.0`
 
 Official references:
 

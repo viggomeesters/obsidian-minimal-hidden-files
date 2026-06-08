@@ -30,7 +30,7 @@ const DEFAULT_SETTINGS: MinimalHiddenFilesSettings = {
 	showUnsupportedFiles: true,
 };
 
-const DENIED_DOT_SEGMENTS = new Set([".obsidian", ".trash", ".git"]);
+const DENIED_DOT_SEGMENTS = new Set([".trash", ".git"]);
 
 function pathSegments(vaultPath: string): string[] {
 	return vaultPath.split("/").filter(Boolean);
@@ -55,7 +55,6 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 	settings: MinimalHiddenFilesSettings = DEFAULT_SETTINGS;
 
 	private originalReconcileDeletion: ReconcileDeletion | null = null;
-	private originalTranslate: ((...args: unknown[]) => string) | null = null;
 	private previousShowUnsupportedFiles = false;
 	private revealedPaths = new Set<string>();
 
@@ -106,14 +105,12 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 
 	async enableHiddenFiles(): Promise<void> {
 		this.patchAdapter();
-		this.suppressDotfileWarning();
 		await this.adapter().listRecursive("");
 	}
 
 	async disableHiddenFiles(): Promise<void> {
 		await this.hideRevealedPaths();
 		this.restoreAdapter();
-		this.restoreDotfileWarning();
 	}
 
 	private getShowUnsupportedFiles(): boolean {
@@ -198,36 +195,6 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 		this.revealedPaths.clear();
 	}
 
-	private suppressDotfileWarning(): void {
-		const targetWindow = window as unknown as {
-			i18next?: { t: (...args: unknown[]) => string };
-		};
-
-		if (!targetWindow.i18next || this.originalTranslate) {
-			return;
-		}
-
-		const originalTranslate = targetWindow.i18next.t.bind(targetWindow.i18next);
-		this.originalTranslate = originalTranslate;
-
-		targetWindow.i18next.t = (...args: unknown[]): string => {
-			if (args[0] === "plugins.file-explorer.msg-bad-dotfile") {
-				return "";
-			}
-			return originalTranslate(...args);
-		};
-	}
-
-	private restoreDotfileWarning(): void {
-		const targetWindow = window as unknown as {
-			i18next?: { t: (...args: unknown[]) => string };
-		};
-
-		if (targetWindow.i18next && this.originalTranslate) {
-			targetWindow.i18next.t = this.originalTranslate;
-		}
-		this.originalTranslate = null;
-	}
 }
 
 class MinimalHiddenFilesSettingTab extends PluginSettingTab {
@@ -271,6 +238,6 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Default exclusions")
-			.setDesc(".obsidian, .trash, and .git are always hidden in v0.1.");
+			.setDesc("The vault configuration folder, trash folder, and Git folder are always hidden.");
 	}
 }
