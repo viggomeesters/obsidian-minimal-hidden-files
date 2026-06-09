@@ -24,6 +24,7 @@ It does not add a sidebar, tree browser, preview panel, dashboard, or custom fil
 - Enables Obsidian's native unsupported-file visibility setting while active, so non-Markdown files can appear in the explorer.
 - Restores the previous unsupported-file visibility setting when the plugin is disabled.
 - Excludes `.obsidian`, the active vault config directory, `.trash`, and `.git` by default in v0.1.
+- Hides generated SQLite sidecars such as `.sqlite-wal`, `.sqlite-shm`, `.db-wal`, and `.db-shm` by default, with a diagnostic setting to reveal them temporarily.
 - Uses no runtime dependencies and no custom file-management UI.
 
 ## Safety and privacy
@@ -39,6 +40,13 @@ The v0.1 denylist is intentionally hardcoded:
 - `.obsidian` and the active `Vault.configDir` stay hidden to avoid exposing workspace, plugin, and vault configuration internals.
 - `.trash` stays hidden because it is not useful for normal navigation.
 - `.git` stays hidden because it is noisy, large, and easy to damage.
+
+SQLite runtime sidecars are also hidden by default:
+
+- `x.sqlite-wal` and `x.db-wal` are write-ahead log files.
+- `x.sqlite-shm` and `x.db-shm` are shared-memory index files.
+
+Those files are generated next to active databases and are usually noise in the File Explorer. Turn on **Reveal SQLite sidecars** only when diagnosing database/runtime behavior. If they are visible, pair this plugin with a viewer that handles them as sidecars rather than standalone databases.
 
 ## Installation
 
@@ -71,6 +79,7 @@ Enable the plugin and use the built-in Obsidian File Explorer as usual. The plug
 Use the plugin settings to:
 
 - reveal or hide allowed dotfiles and dotfolders
+- temporarily reveal SQLite WAL/SHM sidecars for diagnosis
 - sync Obsidian's native unsupported-file visibility setting
 - manually rescan hidden files
 

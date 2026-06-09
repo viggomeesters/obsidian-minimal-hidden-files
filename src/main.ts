@@ -22,15 +22,18 @@ interface InternalFileSystemAdapter {
 
 interface MinimalHiddenFilesSettings {
 	showHiddenFiles: boolean;
+	showSqliteSidecars: boolean;
 	showUnsupportedFiles: boolean;
 }
 
 const DEFAULT_SETTINGS: MinimalHiddenFilesSettings = {
 	showHiddenFiles: true,
+	showSqliteSidecars: false,
 	showUnsupportedFiles: true,
 };
 
 const DENIED_DOT_SEGMENTS = new Set([".trash", ".git"]);
+const SQLITE_SIDECAR_SUFFIXES = [".sqlite-wal", ".sqlite-shm", ".db-wal", ".db-shm"];
 
 function pathSegments(vaultPath: string): string[] {
 	return vaultPath.split("/").filter(Boolean);
@@ -46,9 +49,17 @@ function hasDeniedSegment(vaultPath: string, configDir: string): boolean {
 	);
 }
 
-function isAllowedHiddenPath(vaultPath: string, configDir: string): boolean {
+function isSqliteSidecarPath(vaultPath: string): boolean {
+	const normalized = vaultPath.toLowerCase();
+	return SQLITE_SIDECAR_SUFFIXES.some((suffix) => normalized.endsWith(suffix));
+}
+
+function isAllowedHiddenPath(vaultPath: string, configDir: string, showSqliteSidecars: boolean): boolean {
 	const segments = pathSegments(vaultPath);
-	return segments.some(isDotSegment) && !hasDeniedSegment(vaultPath, configDir);
+	if (!segments.some(isDotSegment) || hasDeniedSegment(vaultPath, configDir)) {
+		return false;
+	}
+	return showSqliteSidecars || !isSqliteSidecarPath(vaultPath);
 }
 
 export default class MinimalHiddenFilesPlugin extends Plugin {
@@ -147,7 +158,7 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 		adapter.reconcileDeletion = async (realPath: string, vaultPath: string): Promise<void> => {
 			if (
 				!this.settings.showHiddenFiles ||
-				!isAllowedHiddenPath(vaultPath, this.app.vault.configDir)
+				!isAllowedHiddenPath(vaultPath, this.app.vault.configDir, this.settings.showSqliteSidecars)
 			) {
 				await originalReconcileDeletion(realPath, vaultPath);
 				return;
@@ -236,6 +247,21 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
+			.setName("Reveal SQLite sidecars")
+			.setDesc("Shows .sqlite-wal, .sqlite-shm, .db-wal, and .db-shm runtime files for diagnosis. Off by default.")
+			.addToggle((toggle) => {
+				toggle.setValue(this.plugin.settings.showSqliteSidecars).onChange(async (value) => {
+					this.plugin.settings.showSqliteSidecars = value;
+					await this.plugin.saveSettings();
+
+					if (this.plugin.settings.showHiddenFiles) {
+						await this.plugin.disableHiddenFiles();
+						await this.plugin.enableHiddenFiles();
+					}
+				});
+			});
+
+		new Setting(containerEl)
 			.setName("Show unsupported file types")
 			.setDesc('Mirrors Obsidian\'s native "Detect all file extensions" setting.')
 			.addToggle((toggle) => {
@@ -257,6 +283,6 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Default exclusions")
-			.setDesc("The vault configuration folder, trash folder, and Git folder are always hidden.");
+			.setDesc("The vault configuration folder, trash folder, and Git folder are always hidden. SQLite WAL/SHM sidecars are hidden unless the diagnostic toggle is enabled.");
 	}
 }
