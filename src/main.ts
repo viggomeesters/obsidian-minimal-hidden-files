@@ -70,11 +70,16 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 
 		this.app.workspace.onLayoutReady(() => {
 			if (this.settings.showHiddenFiles) {
-				this.enableHiddenFiles().catch((error) => {
-					console.error("Minimal Hidden Files: failed to reveal hidden files", error);
-					new Notice("Minimal Hidden Files failed to rescan hidden files. See console.");
-				});
+				this.enableHiddenFiles();
 			}
+		});
+
+		this.addCommand({
+			id: "rescan-hidden-files",
+			name: "Rescan hidden files",
+			callback: () => {
+				void this.rescanHiddenFiles();
+			},
 		});
 
 		this.addSettingTab(new MinimalHiddenFilesSettingTab(this.app, this));
@@ -103,9 +108,14 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 		this.app.vault.setConfig("showUnsupportedFiles", this.settings.showUnsupportedFiles);
 	}
 
-	async enableHiddenFiles(): Promise<void> {
+	enableHiddenFiles(): void {
+		this.patchAdapter();
+	}
+
+	async rescanHiddenFiles(): Promise<void> {
 		this.patchAdapter();
 		await this.adapter().listRecursive("");
+		new Notice("Minimal Hidden Files rescan complete.");
 	}
 
 	async disableHiddenFiles(): Promise<void> {
@@ -218,7 +228,7 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 
 					if (value) {
-						await this.plugin.enableHiddenFiles();
+						this.plugin.enableHiddenFiles();
 					} else {
 						await this.plugin.disableHiddenFiles();
 					}
@@ -233,6 +243,15 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 					this.plugin.settings.showUnsupportedFiles = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyUnsupportedFileVisibility();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("Rescan hidden files")
+			.setDesc("Manually scan the vault for hidden paths. Automatic startup rescans are skipped for performance.")
+			.addButton((button) => {
+				button.setButtonText("Rescan").onClick(() => {
+					void this.plugin.rescanHiddenFiles();
 				});
 			});
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Removed the automatic full-vault hidden-file rescan from startup.
+- Kept the adapter patch lightweight on load and added an explicit manual rescan command/settings button for large vaults.
+
 ## 0.1.2
 
 - Remove the hardcoded `.obsidian` source-code string; the vault configuration folder is denied through `Vault.configDir`.

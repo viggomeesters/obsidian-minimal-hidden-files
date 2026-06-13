@@ -1,7 +1,7 @@
 {
 	"id": "minimal-hidden-files",
 	"name": "Minimal Hidden Files",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"minAppVersion": "1.8.0",
 	"description": "Reveal safe dotfiles and dotfolders in the native File Explorer.",
 	"author": "Viggo Meesters",

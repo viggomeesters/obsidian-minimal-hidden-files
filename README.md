@@ -66,16 +66,17 @@ https://github.com/viggomeesters/obsidian-minimal-hidden-files
 
 ## Usage
 
-Enable the plugin and use the built-in Obsidian File Explorer as usual. Allowed dotfiles and dotfolders will appear in the native tree.
+Enable the plugin and use the built-in Obsidian File Explorer as usual. The plugin patches hidden-path reconciliation on startup without automatically scanning the whole vault. Use **Rescan hidden files** when you want to discover existing hidden paths in a large vault.
 
 Use the plugin settings to:
 
 - reveal or hide allowed dotfiles and dotfolders
 - sync Obsidian's native unsupported-file visibility setting
+- manually rescan hidden files
 
 ## How it works
 
-Obsidian hides dot-prefixed files and folders during vault reconciliation. Minimal Hidden Files patches the desktop file-system adapter's internal `reconcileDeletion` method so allowed dot paths are registered instead of hidden. It then asks the adapter to rescan the vault.
+Obsidian hides dot-prefixed files and folders during vault reconciliation. Minimal Hidden Files patches the desktop file-system adapter's internal `reconcileDeletion` method so allowed dot paths are registered instead of hidden. To avoid startup performance issues in large vaults, full-vault rescans are manual rather than automatic.
 
 Unsupported extensions are handled by Obsidian's own internal `vault.setConfig("showUnsupportedFiles", true)` setting.
 
@@ -117,10 +118,10 @@ The current release is ready for review when:
 
 - root `README.md`, `LICENSE`, and `manifest.json` exist
 - `manifest.json.id` is `minimal-hidden-files`
-- `manifest.json.version` is `0.1.2`
-- GitHub release `0.1.2` exists
+- `manifest.json.version` is `0.1.3`
+- GitHub release `0.1.3` exists
 - release assets include `main.js`, `manifest.json`, and `styles.css`
-- `versions.json` maps plugin version `0.1.2` to minimum Obsidian version `1.8.0`
+- `versions.json` maps plugin version `0.1.3` to minimum Obsidian version `1.8.0`
 
 Official references:
 
