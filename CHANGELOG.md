@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4 - 2026-10-25
+
+- Prevent a deadlock in the native adapter queue while revealing hidden files; drain pending reveals before disabling.
+- Current Community installation documentation.
+
+
 ## 0.1.3
 
 - Removed the automatic full-vault hidden-file rescan from startup.

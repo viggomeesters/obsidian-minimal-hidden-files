@@ -52,11 +52,9 @@ Those files are generated next to active databases and are usually noise in the 
 
 ### Community plugin directory
 
-Minimal Hidden Files is prepared for submission to the Obsidian Community plugin directory. Once accepted, it can be installed from **Settings -> Community plugins -> Browse** inside Obsidian.
+Install from the [Obsidian Community directory](https://community.obsidian.md/plugins/minimal-hidden-files) or search for Minimal Hidden Files in Settings → Community plugins → Browse.
 
 ### Manual installation
-
-Until the community directory submission is accepted:
 
 1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/viggomeesters/obsidian-minimal-hidden-files/releases/latest).
 2. Create this folder in your vault: `.obsidian/plugins/minimal-hidden-files/`.
@@ -113,30 +111,9 @@ Obsidian installs community plugin files from GitHub releases. For each release:
 
 The release workflow in `.github/workflows/release.yml` can publish those assets after the version has been updated and committed.
 
-## Community directory submission
+## Community directory
 
-The repository is prepared for Obsidian Community plugin submission. The remaining submission step must be completed by the repository owner in the Obsidian Community site because it requires signing in, linking GitHub, and confirming the developer policies/support commitment.
-
-Submit this repository URL:
-
-```text
-https://github.com/viggomeesters/obsidian-minimal-hidden-files
-```
-
-The current release is ready for review when:
-
-- root `README.md`, `LICENSE`, and `manifest.json` exist
-- `manifest.json.id` is `minimal-hidden-files`
-- `manifest.json.version` is `0.1.3`
-- GitHub release `0.1.3` exists
-- release assets include `main.js`, `manifest.json`, and `styles.css`
-- `versions.json` maps plugin version `0.1.3` to minimum Obsidian version `1.8.0`
-
-Official references:
-
-- [Submit your plugin](https://docs.obsidian.md/Plugins/Releasing/Submit%20your%20plugin)
-- [Manifest](https://docs.obsidian.md/Reference/Manifest)
-- [Obsidian releases repository](https://github.com/obsidianmd/obsidian-releases)
+Minimal Hidden Files is listed in the [Obsidian Community directory](https://community.obsidian.md/plugins/minimal-hidden-files).
 
 ## Attribution
 

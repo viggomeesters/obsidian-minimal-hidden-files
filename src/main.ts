@@ -68,6 +68,11 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 	private originalReconcileDeletion: ReconcileDeletion | null = null;
 	private previousShowUnsupportedFiles = false;
 	private revealedPaths = new Set<string>();
+	private pendingReveals = new Set<Promise<void>>();
+	private stoppingReveals = false;
+	private hiddenFilesRequested = false;
+	private disableInProgress: Promise<void> | null = null;
+	private unloading = false;
 
 	async onload(): Promise<void> {
 		if (!Platform.isDesktopApp) {
@@ -97,6 +102,7 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 	}
 
 	onunload(): void {
+		this.unloading = true;
 		this.disableHiddenFiles()
 			.catch((error) => {
 				console.error("Minimal Hidden Files: failed to restore hidden file state", error);
@@ -120,18 +126,34 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 	}
 
 	enableHiddenFiles(): void {
-		this.patchAdapter();
+		if (this.unloading) return;
+		this.hiddenFilesRequested = true;
+		if (!this.disableInProgress) this.patchAdapter();
 	}
 
 	async rescanHiddenFiles(): Promise<void> {
-		this.patchAdapter();
+		if (this.settings.showHiddenFiles) this.enableHiddenFiles();
+		if (this.disableInProgress) await this.disableInProgress;
 		await this.adapter().listRecursive("");
 		new Notice("Minimal Hidden Files rescan complete.");
 	}
 
 	async disableHiddenFiles(): Promise<void> {
-		await this.hideRevealedPaths();
-		this.restoreAdapter();
+		this.hiddenFilesRequested = false;
+		if (!this.disableInProgress) {
+			this.stoppingReveals = true;
+			this.disableInProgress = (async () => {
+				try {
+					await Promise.all(this.pendingReveals);
+					await this.hideRevealedPaths();
+				} finally {
+					this.restoreAdapter();
+					this.disableInProgress = null;
+					if (this.hiddenFilesRequested && !this.unloading) this.patchAdapter();
+				}
+			})();
+		}
+		await this.disableInProgress;
 	}
 
 	private getShowUnsupportedFiles(): boolean {
@@ -154,9 +176,11 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 		const adapter = this.adapter();
 		const originalReconcileDeletion: ReconcileDeletion = adapter.reconcileDeletion.bind(adapter);
 		this.originalReconcileDeletion = originalReconcileDeletion;
+		this.stoppingReveals = false;
 
 		adapter.reconcileDeletion = async (realPath: string, vaultPath: string): Promise<void> => {
 			if (
+				this.stoppingReveals ||
 				!this.settings.showHiddenFiles ||
 				!isAllowedHiddenPath(vaultPath, this.app.vault.configDir, this.settings.showSqliteSidecars)
 			) {
@@ -165,14 +189,22 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 			}
 
 			const fullPath = adapter.getFullPath(vaultPath);
-			if (!(await adapter._exists(fullPath, vaultPath))) {
+			const exists = await adapter._exists(fullPath, vaultPath);
+			if (!exists || this.stoppingReveals) {
 				this.revealedPaths.delete(vaultPath);
 				await originalReconcileDeletion(realPath, vaultPath);
 				return;
 			}
 
 			this.revealedPaths.add(vaultPath);
-			await this.revealPath(vaultPath);
+			// Reconciliation already runs inside the adapter queue. Waiting here for
+			// stat/list operations queued by revealPath would deadlock every file read.
+			const reveal = this.revealPath(vaultPath).catch((error: unknown) => {
+				// Keep cleanup tracking: folder creation may have succeeded before a later error.
+				console.error("Minimal Hidden Files: failed to reveal hidden path", error);
+			});
+			this.pendingReveals.add(reveal);
+			void reveal.finally(() => this.pendingReveals.delete(reveal));
 		};
 	}
 
@@ -226,63 +258,73 @@ class MinimalHiddenFilesSettingTab extends PluginSettingTab {
 		super(app, plugin);
 	}
 
-	display(): void {
-		const { containerEl } = this;
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName("Reveal dotfiles and dotfolders")
-			.setDesc("Shows allowed dot-prefixed files and folders in the native File Explorer.")
-			.addToggle((toggle) => {
+  getSettingDefinitions(): Array<{ name: string; desc: string; render: (setting: Setting) => void }> {
+    return [
+      {
+        name: "Reveal dotfiles and dotfolders",
+        desc: "Shows allowed dot-prefixed files and folders in the native file explorer.",
+        render: (setting) => { setting.addToggle((toggle) => {
 				toggle.setValue(this.plugin.settings.showHiddenFiles).onChange(async (value) => {
 					this.plugin.settings.showHiddenFiles = value;
 					await this.plugin.saveSettings();
 
-					if (value) {
+					if (this.plugin.settings.showHiddenFiles) {
 						this.plugin.enableHiddenFiles();
 					} else {
 						await this.plugin.disableHiddenFiles();
 					}
 				});
-			});
-
-		new Setting(containerEl)
-			.setName("Reveal SQLite sidecars")
-			.setDesc("Shows .sqlite-wal, .sqlite-shm, .db-wal, and .db-shm runtime files for diagnosis. Off by default.")
-			.addToggle((toggle) => {
+			}); },
+      },
+      {
+        name: "Reveal SQLite sidecars",
+        desc: "Shows .sqlite-wal, .sqlite-shm, .db-wal, and .db-shm runtime files for diagnosis. Off by default.",
+        render: (setting) => { setting.addToggle((toggle) => {
 				toggle.setValue(this.plugin.settings.showSqliteSidecars).onChange(async (value) => {
 					this.plugin.settings.showSqliteSidecars = value;
 					await this.plugin.saveSettings();
 
 					if (this.plugin.settings.showHiddenFiles) {
 						await this.plugin.disableHiddenFiles();
-						await this.plugin.enableHiddenFiles();
+						if (this.plugin.settings.showHiddenFiles) this.plugin.enableHiddenFiles();
 					}
 				});
-			});
-
-		new Setting(containerEl)
-			.setName("Show unsupported file types")
-			.setDesc('Mirrors Obsidian\'s native "Detect all file extensions" setting.')
-			.addToggle((toggle) => {
+			}); },
+      },
+      {
+        name: "Show unsupported file types",
+        desc: 'Also show file types unsupported by Obsidian.',
+        render: (setting) => { setting.addToggle((toggle) => {
 				toggle.setValue(this.plugin.settings.showUnsupportedFiles).onChange(async (value) => {
 					this.plugin.settings.showUnsupportedFiles = value;
 					await this.plugin.saveSettings();
 					this.plugin.applyUnsupportedFileVisibility();
 				});
-			});
-
-		new Setting(containerEl)
-			.setName("Rescan hidden files")
-			.setDesc("Manually scan the vault for hidden paths. Automatic startup rescans are skipped for performance.")
-			.addButton((button) => {
+			}); },
+      },
+      {
+        name: "Rescan hidden files",
+        desc: "Manually scan the vault for hidden paths. Automatic startup rescans are skipped for performance.",
+        render: (setting) => { setting.addButton((button) => {
 				button.setButtonText("Rescan").onClick(() => {
 					void this.plugin.rescanHiddenFiles();
 				});
-			});
+			}); },
+      },
+      {
+        name: "Default exclusions",
+        desc: "The vault configuration folder, trash folder, and Git folder are always hidden. SQLite WAL/SHM sidecars are hidden unless the diagnostic toggle is enabled.",
+        render: (setting) => { void setting; },
+      },
+    ];
+  }
 
-		new Setting(containerEl)
-			.setName("Default exclusions")
-			.setDesc("The vault configuration folder, trash folder, and Git folder are always hidden. SQLite WAL/SHM sidecars are hidden unless the diagnostic toggle is enabled.");
-	}
+  // Obsidian before 1.13 renders the same controls through this fallback.
+  display(): void {
+    this.containerEl.empty();
+    for (const item of this.getSettingDefinitions()) {
+      const setting = new Setting(this.containerEl).setName(item.name).setDesc(item.desc);
+      item.render(setting);
+    }
+  }
 }
