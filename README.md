@@ -109,7 +109,9 @@ Obsidian installs community plugin files from GitHub releases. For each release:
 3. Create a GitHub release whose tag exactly matches `manifest.json.version`.
 4. Attach `main.js`, `manifest.json`, and `styles.css` as release assets.
 
-The release workflow in `.github/workflows/release.yml` can publish those assets after the version has been updated and committed.
+Publish the validated assets manually after local checks and independent review; do not use GitHub Actions.
+
+The [Obsidian 1.15.1 assessment](docs/obsidian-1.15.1.md) records the checked source, local results and outstanding runtime validation.
 
 ## Community directory
 
