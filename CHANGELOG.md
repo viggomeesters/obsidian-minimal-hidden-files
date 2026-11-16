@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5 - 2026-11-16
+
+- Rescan dotfiles beneath cached folders and wait for nested reveals before reporting completion.
+- Verify behavior on Obsidian 1.15.1 using isolated synthetic fixtures.
+
 ## 0.1.4 - 2026-10-25
 
 - Prevent a deadlock in the native adapter queue while revealing hidden files; drain pending reveals before disabling.

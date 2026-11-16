@@ -1,11 +1,15 @@
-# Obsidian 1.15.1 assessment — 16 November 2026
+# Obsidian 1.15.1 verification — 16 November 2026
 
-Source assessed: `f0e6e8537b14b1b4f98bb47017d42a0a144c0843`, plugin 0.1.4.
+Patch candidate: `0.1.5`.
 
-[Obsidian desktop 1.15.1](https://obsidian.md/changelog/2026-11-12-desktop-v1.15.1/) changes startup, indexing and File Explorer performance. The plugin patches private adapter `reconcileDeletion` and uses internal reconciliation helpers. Their continued behavior requires a real host test; public release notes do not guarantee these internal interfaces.
+A root-only scan skipped dotfiles beneath already cached folders after disable/re-enable. The scan now revisits loaded folders and drains pending parent/child reveals before completion. Runtime checks cover nested reveals, denylisted Git/trash paths, SQLite-sidecar opt-in/out through the settings handler, normal hidden-note opening, disable/re-enable, unload, configuration restoration and unchanged fixture bytes.
 
-Local checks passed on macOS: `npm ci --ignore-scripts`, `npm run lint`, and `npm test` (typecheck, production build, bundle smoke and serialized-adapter regression). The regression covers safe dotpaths, denylist, sidecar opt-in, queue progress, errors and disable cleanup, including overlapping enable/disable. The build SHA-256 was `dedce4c560db350f0bf301fdc2adecce90fcc67518f0ff1a58d6c838289d01cb`. These are test-double checks, not Obsidian 1.15.1 runtime evidence.
+## Environment and checks
 
-Actual allowed/forbidden paths, create/rename/delete and disable/recovery in the designated test vault remain unverified. No established background connection to a 1.15.1 host was available; the running application and existing fixtures/settings were left untouched. [Issue #3](https://github.com/viggomeesters/obsidian-minimal-hidden-files/issues/3) remains open. No version bump or release is justified by these local checks alone.
+Tests use fictional fixtures in a separate synthetic vault on macOS arm64, the actual Obsidian 1.15.1 renderer and Electron 39.8.3. A bounded own bootstrap changes CLI socket ownership and test-window handling, with mock keychain enabled. The regular application, CLI endpoint and source files are protected and checked separately. The test window is allowed to be visible and remains unfocused; no OS mouse or keyboard input is used.
 
-Dependency triage: the locked development tree reported 16 npm audit findings (three high, 13 moderate), including brace-expansion, fast-uri, js-yaml and the Obsidian SDK/Moment and lint-tool chains. `npm audit --omit=dev` reported none. These counts concern the build environment, not proof of shipped runtime exposure or safety. A trial of compatible automatic fixes reduced the count to 14 but refreshed unrelated peers/tooling and left findings; that lockfile change was discarded. Resolve the development advisories in a separately scoped toolchain update rather than force major upgrades during host compatibility work.
+Local validation uses the checked-in lockfile with ordinary `npm ci`, TypeScript checking, production build, existing scripts and production dependency audit. The official `eslint-plugin-obsidianmd` 0.6.0 recommended configuration checks source, manifest, package metadata and license with zero errors or warnings. Its development dependencies are not shipped. The existing repository npm test suite passed.
+
+## Scope limits
+
+This establishes the exercised 1.15.1 desktop behavior. It does not establish mobile, minimum-version, native window resize, authentication or real keychain behavior. Viewer leaves are detached by the harness before unload; unregister/reload checks do not prove automatic closure of every open leaf. Public release, official Community review and fresh catalog installation are separate gates and are not claimed by a successful local build or screenshot.

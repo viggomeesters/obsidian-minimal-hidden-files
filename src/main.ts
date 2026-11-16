@@ -1,4 +1,4 @@
-import { App, Notice, Platform, Plugin, PluginSettingTab, Setting, type Stat } from "obsidian";
+import { App, Notice, Platform, Plugin, PluginSettingTab, Setting, TFolder, type Stat } from "obsidian";
 
 declare module "obsidian" {
 	interface Vault {
@@ -132,9 +132,20 @@ export default class MinimalHiddenFilesPlugin extends Plugin {
 	}
 
 	async rescanHiddenFiles(): Promise<void> {
-		if (this.settings.showHiddenFiles) this.enableHiddenFiles();
+		if (!this.settings.showHiddenFiles || this.unloading) return;
+		this.enableHiddenFiles();
 		if (this.disableInProgress) await this.disableInProgress;
-		await this.adapter().listRecursive("");
+		// Obsidian only descends into newly reconciled folders. Existing parent
+		// folders therefore need an explicit scan after hidden entries are removed.
+		const folders = ["", ...this.app.vault.getAllLoadedFiles()
+			.filter((file): file is TFolder => file instanceof TFolder)
+			.map((folder) => folder.path)];
+		for (const folder of folders) {
+			if (this.stoppingReveals || this.unloading) return;
+			await this.adapter().listRecursive(folder);
+			// Revealing a dotfolder may enqueue further child reveals.
+			while (this.pendingReveals.size > 0) await Promise.all(this.pendingReveals);
+		}
 		new Notice("Minimal Hidden Files rescan complete.");
 	}
 

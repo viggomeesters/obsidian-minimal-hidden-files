@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import esbuild from 'esbuild';
 const bundle=await esbuild.build({entryPoints:['src/main.ts'],bundle:true,platform:'browser',format:'cjs',external:['obsidian'],write:false,logLevel:'silent'});
 const mod={exports:{}};
-new Function('require','module','exports',bundle.outputFiles[0].text)(()=>({Plugin:class{},PluginSettingTab:class{},Platform:{isDesktopApp:true},Notice:class{},Setting:class{}}),mod,mod.exports);
+class TFolder { constructor(path){this.path=path;} }
+new Function('require','module','exports',bundle.outputFiles[0].text)(()=>({Plugin:class{},PluginSettingTab:class{},Platform:{isDesktopApp:true},Notice:class{},Setting:class{},TFolder}),mod,mod.exports);
 const Plugin=mod.exports.default;
 const deadline=(promise)=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('serialized adapter queue timed out')),250))]);
 function fixture(){
@@ -41,4 +42,32 @@ console.error=()=>{};
 try{await deadline(partial.queue(()=>partial.adapter.reconcileDeletion('.folder','.folder')));await deadline(partial.plugin.disableHiddenFiles());}finally{console.error=originalError}
 assert.ok(partial.calls.some(([a,p])=>a==='folder'&&p==='.folder'));
 assert.ok(partial.calls.some(([a,p])=>a==='delete'&&p==='.folder'),'partial reveal is removed during disable');
+// Native 1.15.1 only descends into folders that are absent from its cache.
+// A root-only rescan therefore misses a hidden file in an existing folder.
+const cached=fixture();let visible=false;
+cached.plugin.app.vault.getAllLoadedFiles=()=>[new TFolder('existing')];
+cached.adapter.listRecursive=async path=>{if(path==='existing')await cached.adapter.reconcileDeletion('existing/.file','existing/.file');};
+cached.adapter.reconcileFileInternal=async()=>{await new Promise(resolve=>setTimeout(resolve,15));visible=true;};
+const originalDelete=cached.plugin.originalReconcileDeletion;
+cached.plugin.originalReconcileDeletion=async(...args)=>{visible=false;await originalDelete(...args);};
+await deadline(cached.plugin.rescanHiddenFiles());
+assert.equal(visible,true,'rescan waits for reveal in an already cached parent');
+await deadline(cached.plugin.disableHiddenFiles());assert.equal(visible,false);
+cached.plugin.enableHiddenFiles();await deadline(cached.plugin.rescanHiddenFiles());
+assert.equal(visible,true,'disable/re-enable rescan revisits cached parent');
+await deadline(cached.plugin.disableHiddenFiles());
+// A newly revealed dotfolder can schedule children after the first pending
+// snapshot was captured; rescan is complete only after those children finish.
+const nested=fixture();let childVisible=false;
+nested.plugin.app.vault.getAllLoadedFiles=()=>[new TFolder('existing')];
+nested.adapter.stat=path=>nested.queue(async()=>({type:path.endsWith('.parent')?'folder':'file'}));
+nested.adapter.listRecursive=async path=>{
+ if(path==='existing')await nested.adapter.reconcileDeletion('existing/.parent','existing/.parent');
+ if(path==='existing/.parent')await nested.adapter.reconcileDeletion('existing/.parent/.child','existing/.parent/.child');
+};
+nested.adapter.reconcileFileInternal=async()=>{await new Promise(resolve=>setTimeout(resolve,25));childVisible=true;};
+await deadline(nested.plugin.rescanHiddenFiles());
+assert.equal(childVisible,true,'rescan drains child work scheduled by a parent reveal');
+assert.equal(nested.plugin.pendingReveals.size,0,'rescan leaves no pending child reveals');
+await deadline(nested.plugin.disableHiddenFiles());
 console.log('Serialized adapter queue, denylist, sidecar opt-in, read continuity and disable/error cleanup passed.');
